@@ -45,7 +45,7 @@ jobs:
           echo yarn build:frontend
       - name: Build tag and push image to Docker hub
         run: |
-          echo "docker/build-push-action@v5
+          echo "docker/build-push-action@v5"
           echo "tags: ${{ steps.meta.outputs.tags }}"
           echo "labels: ${{ steps.meta.outputs.labels }}"
           echo "build-args: NODE_VERSION=${{ matrix.version }}"

@@ -20,7 +20,7 @@ jobs:
           cache: 'yarn'
       - name: Build
         run: |
-          echo yarn install --frozen-lockfile
+          yarn install --frozen-lockfile --ignore-scripts
       - name: Publish to npm
         run: |
           LATEST=$(npm show unleash-server version)

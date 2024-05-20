@@ -61,7 +61,11 @@ jobs:
           PREV: ${{ env.PREV }}
         run: |
           git-cliff ${{ env.PREV }}..HEAD --tag v${{ github.event.inputs.version }} --prepend CHANGELOG.md
-          git commit -am "docs: Update CHANGELOG.md"
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -am "docs: Update CHANGELOG.md"
+          else
+            echo "No changes to CHANGELOG.md"
+          fi
       - run: echo yarn install --frozen-lockfile --ignore-scripts
       - name: npm version
         run: |
