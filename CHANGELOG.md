@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2024-05-20
+
+### Miscellaneous Tasks
+
+- Bump version to 0.1.0+main
+
+- Bump version to 0.1.1+main
+
+- Bump version to 0.1.2+main
+
+- Bump version to 0.1.3+main
+
+- Bump version to 0.1.4+main
+
+- Bump version to 0.1.55+main
+
+- Bump version to 0.1.56+main
+
+
 ## [5.6.0] - 2023-10-26
 
 ### Bug Fixes
