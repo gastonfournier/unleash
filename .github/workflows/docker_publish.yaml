@@ -21,11 +21,12 @@ jobs:
       matrix:
         version: [18.18.2-alpine]
     steps:
-      - name: Checkout tag
+      - name: Checkout tag v${{ inputs.version }}
         if: ${{ inputs.version != '' }}
         uses: actions/checkout@v4
         with:
           ref: v${{ inputs.version }}
+          fetch-tags: true
       - name: Checkout
         if: ${{ inputs.version == '' }}
         uses: actions/checkout@v4
