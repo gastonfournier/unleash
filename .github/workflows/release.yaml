@@ -1,8 +1,6 @@
 name: 'Publish to npm'
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_call:
 
 jobs:
   build:
@@ -22,22 +20,18 @@ jobs:
           cache: 'yarn'
       - name: Build
         run: |
-          yarn install --frozen-lockfile
+          yarn install --frozen-lockfile --ignore-scripts
       - name: Publish to npm
         run: |
           LATEST=$(npm show unleash-server version)
           TAG=$(node scripts/npm-tag.js $LATEST)
-          npm publish --tag ${TAG:-latest}
+          echo npm publish --tag ${TAG:-latest}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      - run: echo "Ignored aws-actions/configure-aws-credentials@v2"
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Publish static assets to S3
         run: |
-          aws s3 cp frontend/build s3://getunleash-static/unleash/${{ steps.get_version.outputs.VERSION }} --recursive
+          echo aws s3 cp frontend/build s3://getunleash-static/unleash/${{ steps.get_version.outputs.VERSION }} --recursive
