@@ -113,6 +113,8 @@ jobs:
   publish-docker:
     needs: build
     uses: ./.github/workflows/docker_publish.yaml
+    with:
+      version: ${{ github.event.inputs.version }}
   
   publish-npm:
     needs: build
