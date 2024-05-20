@@ -18,6 +18,7 @@ jobs:
         uses: metcalfc/changelog-generator@v4.3.1
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
+          base-ref: v${{ inputs.version }}
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
