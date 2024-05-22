@@ -3,8 +3,6 @@ name: No Response
 on:
   issue_comment:
     types: [created]
-  schedule:
-    - cron: '5 * * * *'
 
 jobs:
   noResponse:
