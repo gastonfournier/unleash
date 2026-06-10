@@ -1,0 +1,52 @@
+import { IconButton, InputAdornment, type TextFieldProps } from '@mui/material';
+import { StyledAutofillTextField } from 'component/user/StyledAutofillTextField';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import type React from 'react';
+import { useState, type FC } from 'react';
+
+const PasswordField: FC<TextFieldProps> = ({ ...rest }) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleMouseDownPassword = (
+        e: React.MouseEvent<HTMLButtonElement>,
+    ) => {
+        e.preventDefault();
+    };
+
+    const IconComponent = showPassword ? Visibility : VisibilityOff;
+    const iconTitle = 'Toggle password visibility';
+
+    return (
+        <StyledAutofillTextField
+            variant='outlined'
+            size='small'
+            type={showPassword ? 'text' : 'password'}
+            slotProps={{
+                input: {
+                    style: {
+                        paddingRight: '0px',
+                    },
+                    endAdornment: (
+                        <InputAdornment position='end'>
+                            <IconButton
+                                onClick={handleClickShowPassword}
+                                onMouseDown={handleMouseDownPassword}
+                                size='large'
+                            >
+                                <IconComponent titleAccess={iconTitle} />
+                            </IconButton>
+                        </InputAdornment>
+                    ),
+                },
+            }}
+            {...rest}
+        />
+    );
+};
+
+export default PasswordField;
