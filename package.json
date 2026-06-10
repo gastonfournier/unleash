@@ -26,12 +26,16 @@
   "bugs": {
     "url": "https://github.com/unleash/unleash/issues"
   },
-  "types": "./dist/lib/server-impl.d.ts",
+  "types": "./src/lib/server-impl.ts",
   "engines": {
     "node": ">=22"
   },
   "license": "AGPL-3.0-or-later",
-  "exports": "./dist/lib/server-impl.js",
+  "exports": "./src/lib/server-impl.ts",
+  "publishConfig": {
+    "types": "./dist/lib/server-impl.d.ts",
+    "exports": "./dist/lib/server-impl.js"
+  },
   "scripts": {
     "ci": "pnpm run lint:fix && pnpm run build:backend && pnpm run test --reporter=dot",
     "start": "TZ=UTC node ./dist/server.js",
