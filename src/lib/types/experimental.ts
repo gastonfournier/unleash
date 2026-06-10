@@ -48,7 +48,6 @@ export type IFlagKey =
     | 'productivityReportUnsubscribers'
     | 'showUserDeviceCount'
     | 'memorizeStats'
-    | 'streaming'
     | 'denyStreamingForNonEdge'
     | 'deltaApi'
     | 'uniqueSdkTracking'
@@ -265,13 +264,6 @@ const flags: IFlags = {
         process.env.UNLEASH_EXPERIMENTAL_DISABLE_IMPACT_METRICS,
         false,
     ),
-    streaming: {
-        name: 'disabled',
-        enabled: parseEnvVarBoolean(
-            process.env.UNLEASH_EXPERIMENTAL_STREAMING,
-            false,
-        ),
-    },
     denyStreamingForNonEdge: parseEnvVarBoolean(
         process.env.UNLEASH_EXPERIMENTAL_STREAMING_DENY_STREAMING_FOR_NON_EDGE,
         false,
