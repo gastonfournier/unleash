@@ -178,6 +178,12 @@ export default class FeatureController extends Controller {
         const inlineSegmentConstraints =
             !this.clientSpecService.requestSupportsSpec(req, 'segments');
 
+        if (inlineSegmentConstraints) {
+            this.logger.warn(
+                'Downstream SDK requesting legacy inline segments'
+            );
+        }
+
         return this.prepQuery({
             ...query,
             ...override,
