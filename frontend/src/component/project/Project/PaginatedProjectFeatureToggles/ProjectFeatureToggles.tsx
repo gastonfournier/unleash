@@ -7,6 +7,7 @@ import { PaginatedTable } from 'component/common/Table';
 import { SearchHighlightProvider } from 'component/common/Table/SearchHighlightContext/SearchHighlightContext';
 import { FavoriteIconHeader } from 'component/common/Table/FavoriteIconHeader/FavoriteIconHeader';
 import { ActionsCell } from '../ProjectFeatureToggles/ActionsCell/ActionsCell.tsx';
+import { ArchivedActionsCell } from '../ProjectFeatureToggles/ActionsCell/ArchivedActionsCell.tsx';
 import { useFavoriteFeaturesApi } from 'hooks/api/actions/useFavoriteFeaturesApi/useFavoriteFeaturesApi';
 import { MemoizedRowSelectCell } from '../ProjectFeatureToggles/RowSelectCell/RowSelectCell.tsx';
 import { BatchSelectionActionsBar } from 'component/common/BatchSelectionActionsBar/BatchSelectionActionsBar';
@@ -40,6 +41,7 @@ import {
 import { AvatarCell } from './AvatarCell.tsx';
 import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
 import useProjectOverview from 'hooks/api/getters/useProjectOverview/useProjectOverview';
+import { useProjectStatus } from 'hooks/api/getters/useProjectStatus/useProjectStatus';
 import { ConnectSdkDialog } from '../../../onboarding/dialog/ConnectSdkDialog/ConnectSdkDialog.tsx';
 import { ProjectOnboarding } from '../../../onboarding/flow/ProjectOnboarding.tsx';
 import { useLocalStorageState } from 'hooks/useLocalStorageState';
@@ -52,6 +54,7 @@ import { formatEnvironmentColumnId } from './formatEnvironmentColumnId.ts';
 import { ProjectFeaturesColumnsMenu } from './ProjectFeaturesColumnsMenu/ProjectFeaturesColumnsMenu.tsx';
 import { ProjectFeatureTogglesHeader } from './ProjectFeatureTogglesHeader/ProjectFeatureTogglesHeader.tsx';
 import { ProjectFlagsSearch } from './ProjectFlagsSearch/ProjectFlagsSearch.tsx';
+import { useUiFlag } from 'hooks/useUiFlag.ts';
 
 type ProjectFeatureTogglesProps = {
     environments: string[];
@@ -109,6 +112,8 @@ export const ProjectFeatureToggles = ({
     const [modalOpen, setModalOpen] = useState(false);
     const theme = useTheme();
     const isMediumScreen = useMediaQuery(theme.breakpoints.down('xl'));
+    const archiveInFlagsView = useUiFlag('archiveInFlagsView');
+    const showArchivedLink = !archiveInFlagsView;
 
     const {
         features,
@@ -120,8 +125,25 @@ export const ProjectFeatureToggles = ({
         setTableState,
     } = useProjectFeatureSearch(projectId);
 
+    // The legacy archived view can still be reached through old URLs;
+    // rewrite them to the archived lifecycle filter, which has replaced it.
+    useEffect(() => {
+        if (archiveInFlagsView && tableState.archived) {
+            setTableState({
+                archived: undefined,
+                lifecycle: { operator: 'IS', values: ['archived'] },
+            });
+        }
+    }, [archiveInFlagsView, tableState.archived, setTableState]);
+
     const { onFlagTypeClick, onTagClick, onAvatarClick } =
         useProjectFeatureSearchActions(tableState, setTableState);
+
+    const { refetch: refetchProjectStatus } = useProjectStatus(projectId);
+    const refetchWithLifecycleCounts = useCallback(() => {
+        refetch();
+        refetchProjectStatus();
+    }, [refetch, refetchProjectStatus]);
 
     const filterState = {
         tag: tableState.tag,
@@ -164,7 +186,11 @@ export const ProjectFeatureToggles = ({
         setShowMarkCompletedDialogue,
         setShowFeatureReviveDialogue,
         setShowFeatureDeleteDialogue,
-    } = useRowActions(refetch, projectId, trackArchiveAction);
+    } = useRowActions(
+        refetchWithLifecycleCounts,
+        projectId,
+        trackArchiveAction,
+    );
 
     const isPlaceholder = Boolean(initialLoad || loading);
 
@@ -279,7 +305,7 @@ export const ProjectFeatureToggles = ({
                                 open: true,
                             });
                         }}
-                        onUncomplete={refetch}
+                        onUncomplete={refetchWithLifecycleCounts}
                         onArchive={() => setFeatureArchiveState(original.name)}
                         data-loading
                     />
@@ -357,6 +383,22 @@ export const ProjectFeatureToggles = ({
                     tableState.archived ? (
                         <ArchivedFeatureActionCell
                             project={projectId}
+                            onRevive={() => {
+                                setShowFeatureReviveDialogue({
+                                    featureId: row.id,
+                                    open: true,
+                                });
+                            }}
+                            onDelete={() => {
+                                setShowFeatureDeleteDialogue({
+                                    featureId: row.id,
+                                    open: true,
+                                });
+                            }}
+                        />
+                    ) : row.original.archivedAt ? (
+                        <ArchivedActionsCell
+                            projectId={projectId}
                             onRevive={() => {
                                 setShowFeatureReviveDialogue({
                                     featureId: row.id,
@@ -503,11 +545,16 @@ export const ProjectFeatureToggles = ({
                         totalItems={total}
                         environmentsToExport={environments}
                         actions={
-                            <LinkToggle type='button' onClick={toggleArchived}>
-                                {showArchived
-                                    ? 'View active flags'
-                                    : 'View archived flags'}
-                            </LinkToggle>
+                            showArchivedLink && (
+                                <LinkToggle
+                                    type='button'
+                                    onClick={toggleArchived}
+                                >
+                                    {showArchived
+                                        ? 'View active flags'
+                                        : 'View archived flags'}
+                                </LinkToggle>
+                            )
                         }
                         title={
                             showArchived
@@ -627,7 +674,7 @@ export const ProjectFeatureToggles = ({
                         selectedIds={Object.keys(rowSelection)}
                         projectId={projectId}
                         onConfirm={() => {
-                            refetch();
+                            refetchWithLifecycleCounts();
                             table.resetRowSelection();
                             trackArchiveAction('bulk archived');
                         }}
@@ -638,7 +685,7 @@ export const ProjectFeatureToggles = ({
                         data={selectedData}
                         projectId={projectId}
                         onResetSelection={table.resetRowSelection}
-                        onChange={refetch}
+                        onChange={refetchWithLifecycleCounts}
                     />
                 )}
             </BatchSelectionActionsBar>

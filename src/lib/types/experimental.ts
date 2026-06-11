@@ -77,7 +77,8 @@ export type IFlagKey =
     | 'reactRouter_v7_startTransition'
     | 'newModalDesign'
     | 'archiveInFlagsView'
-    | 'allowDeprecatedApiTokenMiddleware';
+    | 'allowDeprecatedApiTokenMiddleware'
+    | 'newProfileDropdown';
 
 export type IFlags = Partial<{ [key in IFlagKey]: boolean | Variant }>;
 
@@ -342,6 +343,10 @@ const flags: IFlags = {
     ),
     archiveInFlagsView: parseEnvVarBoolean(
         process.env.UNLEASH_EXPERIMENTAL_ARCHIVE_IN_FLAGS_VIEW,
+        false,
+    ),
+    newProfileDropdown: parseEnvVarBoolean(
+        process.env.UNLEASH_EXPERIMENTAL_NEW_PROFILE_DROPDOWN,
         false,
     ),
 };

@@ -19,6 +19,8 @@ import php from './snippets/php.md?raw';
 import react from './snippets/react.md?raw';
 import rust from './snippets/rust.md?raw';
 import swift from './snippets/swift.md?raw';
+import nextjs from './snippets/nextjs.md?raw';
+import reactnative from './snippets/reactnative.md?raw';
 import type { ExtraProps } from 'react-markdown';
 
 export const codeRenderSnippets: Record<SdkName, string> = {
@@ -37,6 +39,8 @@ export const codeRenderSnippets: Record<SdkName, string> = {
     React: react,
     Rust: rust,
     Swift: swift,
+    'Next.js': nextjs,
+    'React Native': reactnative,
 };
 
 const StyledCodeBlock = styled('pre')(({ theme }) => ({
