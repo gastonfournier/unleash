@@ -180,7 +180,7 @@ export default class FeatureController extends Controller {
 
         if (inlineSegmentConstraints) {
             this.logger.warn(
-                'Downstream SDK requesting legacy inline segments'
+                'Downstream SDK requesting legacy inline segments',
             );
         }
 
